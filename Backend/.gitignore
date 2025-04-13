@@ -1,0 +1,27 @@
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+.venv/
+env/
+
+# Archivos de configuración y secretos
+.env
+*.sqlite3
+
+# Archivos de logs
+*.log
+
+# Archivos de migraciones con conflictos
+*/migrations/*.pyc
+*/migrations/*.pyo
+
+# Archivos estáticos y de medios generados por Django
+staticfiles/
+media/
+
+# Dependencias de VSCode
+.vscode/
