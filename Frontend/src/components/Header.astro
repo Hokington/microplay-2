@@ -1,0 +1,48 @@
+---
+import Logo from "../components/Logo.astro";
+import Search from "../components/Search.astro";
+---
+
+<div class="w-screen">
+    <div class="border-b-2 border-primary-100 bg-white">
+        <header
+            class="mx-auto max-w-6xl flex text-sm lg:text-base justify-between items-center p-4 gap-2"
+        >
+            <Logo />
+            <div class="flex items-center justify-end gap-3 w-full">
+                <Search />
+
+                <a
+                    class="font-semibold text-secondary-800 rounded-md text-nowrap hover:bg-secondary-100 hover:text-secondary-900 transition-colors px-4 py-2"
+                    href="/register">Crear cuenta</a
+                >
+                <a
+                    class="font-semibold text-white rounded-md text-nowrap bg-primary-600 hover:bg-primary-700 transition-colors px-4 py-2"
+                    href="/login">Iniciar sesión</a
+                >
+                <a class="" href="/cart">
+                    <svg
+                        class="w-9 h-9 stroke-primary-400 group"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        ><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
+                            id="SVGRepo_tracerCarrier"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></g><g
+                            id="SVGRepo_iconCarrier"
+                        >
+                            <path
+                                class="stroke-primary-400 group-hover:stroke-primary-600 transition-colors"
+                                d="M6.29977 5H21L19 12H7.37671M20 16H8L6 3H3M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z"
+                                stroke="#000000"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                        </g></svg
+                    >
+                </a>
+            </div>
+        </header>
+    </div>
+</div>

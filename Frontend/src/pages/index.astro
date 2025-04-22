@@ -1,0 +1,68 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+
+const res = await fetch("http://localhost:8000/api/categories");
+const categories = await res.json();
+---
+
+<Layout>
+	<div class="flex flex-col gap-4 py-4">
+		<Hero />
+		<main class="relative w-full flex flex-col gap-4 bg-white">
+			<section
+				class="w-full mx-auto max-w-6xl py-6 text-xl text-secondary-800 font-semibold bg-white px-4 rounded-md"
+			>
+				<div class="border-b-2 pb-2 border-primary-100">
+					<h2>Explora nuestros juegos más vendidos</h2>
+				</div>
+				<div class="grid w-full grid-cols-3 gap-3 py-4">
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+				</div>
+			</section>
+			<section
+				class="w-full mx-auto max-w-6xl py-6 text-xl text-secondary-800 font-semibold bg-white"
+			>
+				<div class="border-b-2 pb-2 border-primary-100">
+					<h2>Explora nuestros nuevos accesorios</h2>
+				</div>
+				<div class="grid w-full grid-cols-4 gap-3 py-4">
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+					<div class="w-full aspect-square bg-primary-100"></div>
+				</div>
+			</section>
+		</main>
+	</div>
+	{categories.map((category) => <p>{category.name}</p>)}
+</Layout>
