@@ -6,7 +6,6 @@ class Account(AbstractUser):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-    
 
     ROLE_CHOICES = (
         ('cliente', 'Cliente'),
@@ -14,8 +13,7 @@ class Account(AbstractUser):
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cliente')
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return f"{self.username} ({self.role})"

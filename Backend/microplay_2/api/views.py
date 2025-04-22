@@ -1,11 +1,59 @@
-from rest_framework import viewsets
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from rest_framework import viewsets, permissions
+from .models import Account, Category, Platform, Product, Order, OrderDetail, Payment, Review, CartItem
+from .serializers import (
+    AccountSerializer, CategorySerializer, PlatformSerializer, ProductSerializer,
+    OrderSerializer, OrderDetailSerializer, PaymentSerializer, ReviewSerializer, CartItemSerializer
+)
+
+class AccountViewSet(viewsets.ModelViewSet):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class PlatformViewSet(viewsets.ModelViewSet):
+    queryset = Platform.objects.all()
+    serializer_class = PlatformSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class OrderDetailViewSet(viewsets.ModelViewSet):
+    queryset = OrderDetail.objects.all()
+    serializer_class = OrderDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+    permission_classes = [permissions.IsAuthenticated]

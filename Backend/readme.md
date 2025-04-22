@@ -28,6 +28,7 @@
 
     - python manage.py createsuperuser
 
+    - la cuenta es admin / admin
 
 ## Lista de Tareas
 
@@ -44,9 +45,8 @@
     1. Agregar middlewares
     2. Agregar todos los serializers
 
-
 ## Tareas para alguien mas jsj
 
-    1. Seeding de la DB
-    2. Revisar Base de datos y compararla
-    3. Documentar Cambios del backend
+    1. Seeding de la DB ✅
+    2. Revisar Base de datos y compararla ✅
+    3. Documentar Cambios del backend ✅
