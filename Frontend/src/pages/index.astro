@@ -2,8 +2,8 @@
 import Layout from "../layouts/Layout.astro";
 import Hero from "../components/Hero.astro";
 
-const res = await fetch("http://localhost:8000/api/categories");
-const categories = await res.json();
+const res = await fetch("http://localhost:8000/api/products");
+const products = await res.json();
 ---
 
 <Layout>
@@ -17,36 +17,37 @@ const categories = await res.json();
 					<h2>Explora nuestros juegos más vendidos</h2>
 				</div>
 				<div class="grid w-full grid-cols-3 gap-3 py-4">
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
-					<div class="w-full aspect-square bg-primary-100"></div>
+					{
+						products.map((product) => (
+							<div>
+								<img src={product.image} alt={product.name} />
+								<p class="text-xl font-bold">
+									nombre: {product.name}
+								</p>
+								<p class="text-xs text-gray-700 max-h-16 overlow-hidden truncate">
+									descripcion: {product.description}
+								</p>
+								<p class="text-sm text-gray-700">
+									precio: {product.price}
+								</p>
+								<p class="text-sm text-gray-700">
+									stock: {product.stock}
+								</p>
+								<p class="text-sm text-gray-700">
+									fecha: {product.release_date}
+								</p>
+								<p class="text-sm text-gray-700">
+									categoria: {product.category.name}
+								</p>
+								<p class="text-sm text-gray-700">
+									plataforma: {product?.platform}
+								</p>
+								<p class="text-sm text-gray-700">
+									id: {product.id}
+								</p>
+							</div>
+						))
+					}
 				</div>
 			</section>
 			<section
@@ -64,5 +65,4 @@ const categories = await res.json();
 			</section>
 		</main>
 	</div>
-	{categories.map((category) => <p>{category.name}</p>)}
 </Layout>
