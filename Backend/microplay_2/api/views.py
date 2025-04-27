@@ -4,6 +4,7 @@ from .serializers import (
     AccountSerializer, CategorySerializer, PlatformSerializer, ProductSerializer,
     OrderSerializer, OrderDetailSerializer, PaymentSerializer, ReviewSerializer, CartItemSerializer
 )
+from django_filters.rest_framework import DjangoFilterBackend
 
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
@@ -28,6 +29,23 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    filterset_fields = [
+            'id', 'name', 'description', 'price', 'stock', 'release_date',
+            'category', 'category_id', 'category__parent', 'platform', 'platform_id',
+        ]
+
+    filterset_fields = {
+        'category__parent': ['exact'],
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        limit = self.request.query_params.get('limit', None)
+        
+        if limit is not None:
+            queryset = queryset[:int(limit)]
+        
+        return queryset
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()

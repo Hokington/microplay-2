@@ -1,0 +1,79 @@
+---
+import Logo from "./Logo.astro";
+import type { Category } from "../utils/types";
+import { getCategories } from "../api";
+
+const rawCategories = await getCategories();
+const categories: Category[] = rawCategories.filter(
+    (category: Category) => category.parent === null,
+);
+---
+
+<footer class="bg-white">
+    <div class="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
+        <div class="lg:flex lg:justify-between">
+            <div class="mb-6 lg:mb-0">
+                <Logo />
+            </div>
+            <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+                <div>
+                    <h2
+                        class="mb-6 text-sm font-semibold text-gray-900 uppercase"
+                    >
+                        Recursos
+                    </h2>
+                    <ul class="text-gray-500 font-medium text-sm">
+                        <li class="mb-4">
+                            <a href="/" class="hover:underline">Inicio</a>
+                        </li>
+                        <li class="mb-4">
+                            <a href="/register" class="hover:underline"
+                                >Crear cuenta</a
+                            >
+                        </li>
+                        <li class="mb-4">
+                            <a href="/login" class="hover:underline"
+                                >Iniciar sesión</a
+                            >
+                        </li>
+                        <li class="mb-4">
+                            <a href="/cart" class="hover:underline">Carrito</a>
+                        </li>
+                    </ul>
+                </div>
+                {
+                    categories.map((category: Category) => (
+                        <div>
+                            <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase">
+                                {category.name}s
+                            </h2>
+                            <ul class="text-gray-500 font-medium text-sm grid grid-cols-2 gap-x-2">
+                                {category.subcategories.map(
+                                    (subcategory: Category) => (
+                                        <li class="mb-4">
+                                            <a
+                                                class="hover:underline"
+                                                href={`/search?category=${subcategory.id}`}
+                                            >
+                                                {subcategory.name}
+                                            </a>
+                                        </li>
+                                    ),
+                                )}
+                            </ul>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+        <hr class="my-6 border-gray-200 sm:mx-auto lg:my-8" />
+        <div class="sm:flex sm:items-center sm:justify-center">
+            <span class="text-sm text-gray-500 sm:text-center"
+                >© {new Date().getFullYear()}
+                <a href="https://flowbite.com/" class="hover:underline"
+                    >MicroPlay 2™</a
+                >. Todos los derechos reservados.
+            </span>
+        </div>
+    </div>
+</footer>

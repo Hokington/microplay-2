@@ -1,0 +1,60 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+
+const url = new URL(Astro.request.url);
+const product = url.searchParams.get("product") ?? "";
+const category = url.searchParams.get("category") ?? "";
+
+const res = await fetch("http://localhost:8000/api/products");
+const products = await res.json();
+---
+
+<Layout>
+    <div class="flex flex-col gap-4 py-4">
+        <main
+            class="relative w-full flex gap-4 bg-white max-w-screen-xl mx-auto"
+        >
+            <aside class="w-sm border-2">
+                <h2>FILTROS</h2>
+            </aside>
+            <section
+                class="w-full mx-auto max-w-6xl py-6 text-xl text-secondary-800 font-semibold bg-white px-4 rounded-md"
+            >
+                <div class="grid w-full grid-cols-3 gap-3 py-4">
+                    {
+                        products.map((product) => (
+                            <div>
+                                <img src={product.image} alt={product.name} />
+                                <p class="text-xl font-bold">
+                                    nombre: {product.name}
+                                </p>
+                                <p class="text-xs text-gray-700 max-h-16 overlow-hidden truncate">
+                                    descripcion: {product.description}
+                                </p>
+                                <p class="text-sm text-gray-700">
+                                    precio: {product.price}
+                                </p>
+                                <p class="text-sm text-gray-700">
+                                    stock: {product.stock}
+                                </p>
+                                <p class="text-sm text-gray-700">
+                                    fecha: {product.release_date}
+                                </p>
+                                <p class="text-sm text-gray-700">
+                                    categoria: {product.category.name}
+                                </p>
+                                <p class="text-sm text-gray-700">
+                                    plataforma: {product?.platform}
+                                </p>
+                                <p class="text-sm text-gray-700">
+                                    id: {product.id}
+                                </p>
+                            </div>
+                        ))
+                    }
+                </div>
+            </section>
+        </main>
+    </div>
+</Layout>
