@@ -1,7 +1,128 @@
 ---
+import { login } from "../auth";
 import Layout from "../layouts/Layout.astro";
+
+const url = new URL(Astro.request.url);
+const msg = url.searchParams.get("msg");
+let errors = "";
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const response = await login({ data });
+
+    Astro.cookies.set("token", response.token, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    Astro.cookies.set("user", JSON.stringify(response.user), {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return Astro.redirect("/");
+  } catch (error) {
+    if (error instanceof Error) {
+      errors = error.message;
+      console.error(error.message);
+    }
+  }
+}
 ---
 
 <Layout>
-    <h1>login</h1>
+  <section class="bg-gray-50">
+    <div
+      class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-16"
+    >
+      <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <h1
+            class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl"
+          >
+            Inicia sesión
+          </h1>
+          <form class="space-y-4 md:space-y-6" method="POST">
+            {
+              msg === "denied" && (
+                <p class="bg-cyan-400 px-2 py-3 rounded text-gray-900">
+                  Debes iniciar sesión para acceder a esta página.
+                </p>
+              )
+            }
+            {
+              msg === "success" && (
+                <p class="bg-green-400 px-2 py-3 rounded text-gray-900">
+                  Te has registrado correctamente, inicia sesión para continuar.
+                </p>
+              )
+            }
+            {
+              msg === "logout" && (
+                <p class="bg-green-400 px-2 py-3 rounded text-gray-900">
+                  Has cerrado sesión correctamente.
+                </p>
+              )
+            }
+            {
+              errors && (
+                <p class="bg-red-400 px-2 py-3 rounded text-gray-900">
+                  {errors}
+                </p>
+              )
+            }
+            <div>
+              <label
+                for="username"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Nombre de usuario</label
+              >
+              <input
+                type="text"
+                name="username"
+                id="username"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                placeholder="Hokington1"
+                required=""
+              />
+            </div>
+            <div>
+              <label
+                for="password"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Contraseña</label
+              >
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="••••••••"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                required=""
+              />
+            </div>
+            <div class="">
+              <button
+                type="submit"
+                class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                >Iniciar sesión</button
+              >
+              <p class="text-sm font-light text-gray-500 pt-5">
+                ¿Aún no tienes cuenta? <a
+                  href="/register"
+                  class="font-medium text-primary-600 hover:underline"
+                  >Crear cuenta</a
+                >
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>

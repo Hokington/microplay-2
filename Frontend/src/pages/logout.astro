@@ -1,0 +1,20 @@
+---
+import { logout } from "../auth";
+
+if (Astro.request.method === "GET") {
+  try {
+    const token = Astro.cookies.get("token")?.value;
+
+    if (token) {
+      await logout(token);
+    }
+
+    Astro.cookies.delete("token", { path: "/" });
+
+    return Astro.redirect("/login?msg=logout");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    return Astro.redirect("/login?msg=error");
+  }
+}
+---

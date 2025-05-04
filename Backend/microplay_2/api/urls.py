@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, re_path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     AccountViewSet, CategoryViewSet, PlatformViewSet, ProductViewSet,
@@ -7,6 +7,7 @@ from .views import (
 
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
 
 router = DefaultRouter()
 router.register(r'accounts', AccountViewSet)
@@ -22,6 +23,9 @@ router.register(r'cart-items', CartItemViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    re_path('login', views.login, name='login'),
+    re_path('register', views.register, name='register'),
+    re_path('logout', views.logout, name='logout'),
 ]
 
 if settings.DEBUG:

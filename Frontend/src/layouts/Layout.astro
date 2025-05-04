@@ -5,26 +5,38 @@ import "@fontsource-variable/inter/wght.css";
 import "@fontsource-variable/inter/wght-italic.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { ClientRouter } from "astro:transitions";
 ---
 
 <!doctype html>
 <html lang="es">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<title>Microplay 2</title>
-		<link
-			href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css"
-			rel="stylesheet"
-		/>
-	</head>
-	<body>
-		<Header />
-		<slot />
-		<Footer />
-		<script
-			src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"
-		></script>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Microplay 2</title>
+
+    <ClientRouter fallback="swap" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+  </head>
+  <body>
+    <Header />
+    <slot />
+    <Footer />
+    <script
+      is:inline
+      src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"
+    ></script>
+    <script is:inline>
+      // this is needed so flowbite js library works with view transitions
+      document.addEventListener("astro:page-load", () => {
+        initFlowbite();
+      });
+    </script>
+  </body>
 </html>

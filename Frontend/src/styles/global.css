@@ -1,25 +1,28 @@
 @import "tailwindcss";
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
 
 @theme {
-    --font-sans: "Inter Variable", sans-serif;
-    
-    --color-primary-100: #f0f4fe;
-    --color-primary-200: #d4def8;
-    --color-primary-300: #95aeed;
-    --color-primary-400: #758ce0;
-    --color-primary-500: #6175de;
-    --color-primary-600: #495dc6;
-    --color-primary-700: #3547a4;
-    --color-primary-800: #253586;
-    --color-primary-900: #1f2c6d;
+  --font-sans: "Inter Variable", sans-serif;
 
-    --color-secondary-100: #f8f9fa;
-    --color-secondary-200: #e1e7ec;
-    --color-secondary-300: #d5dde5;
-    --color-secondary-400: #ccd4db;
-    --color-secondary-500: #aebecd;
-    --color-secondary-600: #929fb1;
-    --color-secondary-700: #6e7a8a;
-    --color-secondary-800: #404b5a;
-    --color-secondary-900: #212934;
+  --color-primary-100: #f0f4fe;
+  --color-primary-200: #d4def8;
+  --color-primary-300: #95aeed;
+  --color-primary-400: #758ce0;
+  --color-primary-500: #6175de;
+  --color-primary-600: #495dc6;
+  --color-primary-700: #3547a4;
+  --color-primary-800: #253586;
+  --color-primary-900: #1f2c6d;
+
+  --color-secondary-100: #f8f9fa;
+  --color-secondary-200: #e1e7ec;
+  --color-secondary-300: #d5dde5;
+  --color-secondary-400: #ccd4db;
+  --color-secondary-500: #aebecd;
+  --color-secondary-600: #929fb1;
+  --color-secondary-700: #6e7a8a;
+  --color-secondary-800: #404b5a;
+  --color-secondary-900: #212934;
 }

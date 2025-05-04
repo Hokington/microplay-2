@@ -66,15 +66,14 @@ class Payment(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10)
 
+class CartItem(models.Model):
+    account = models.ForeignKey('Account', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
 class Review(models.Model):
     account = models.ForeignKey('Account', on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     rating = models.IntegerField()
     comment = models.CharField(max_length=250)
     date = models.DateTimeField(auto_now_add=True)
-
-class CartItem(models.Model):
-    account = models.ForeignKey('Account', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-

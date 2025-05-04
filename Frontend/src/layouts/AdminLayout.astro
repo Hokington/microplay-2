@@ -1,21 +1,9 @@
 ---
-import "../styles/global.css";
-import "@fontsource-variable/inter";
-import "@fontsource-variable/inter/wght.css";
-import "@fontsource-variable/inter/wght-italic.css";
-import Header from "../components/Header.astro";
+import AdminNav from "../components/AdminNav.astro";
+import Layout from "./Layout.astro";
 ---
 
-<!doctype html>
-<html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <title>Microplay 2</title>
-    </head>
-    <body>
-        <Header />
-        <slot />
-    </body>
-</html>
+<Layout>
+  <AdminNav />
+  <slot />
+</Layout>

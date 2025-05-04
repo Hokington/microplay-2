@@ -1,0 +1,109 @@
+---
+import AdminLayout from "../../../layouts/Layout.astro";
+import AdminNav from "../../../components/AdminNav.astro";
+
+import type { Platform } from "../../../utils/types";
+import { getPlatforms } from "../../../api";
+
+const response = await getPlatforms();
+const columns = ["Id", "Nombre"];
+const title = "Lista de plataformas";
+const url = "platforms";
+---
+
+<AdminLayout>
+  <AdminNav />
+  <section class="max-w-screen-2xl mx-auto px-2 py-16">
+    <div class="sm:flex justify-between items-baseline mb-4">
+      <h1 class="text-4xl font-bold text-black mb-5">{title}</h1>
+      <div>
+        <input
+          id="search"
+          type="text"
+          name="search"
+          placeholder="Buscar"
+          class="px-6 py-3 border-gray-300 rounded-lg"
+        />
+
+        <a
+          class="px-6 py-3 font-bold text-lg rounded-lg bg-blue-700 hover:bg-blue-800 text-white"
+          href={`/admin/${url}/create`}>Crear ítem</a
+        >
+      </div>
+    </div>
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+          <tr>
+            {
+              columns.map((col) => (
+                <th scope="col" class="px-6 py-3">
+                  {col}
+                </th>
+              ))
+            }
+            <th scope="col" class="px-6 py-3 text-left">
+              <span class="">Editar</span>
+            </th>
+            <th scope="col" class="px-6 py-3 text-right">
+              <span class="">Eliminar</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="results">
+          {
+            response.results.map((product: Platform) => (
+              <tr class="bg-white border-b border-gray-200 transition-all duration-200 ease-in-out">
+                <td class="px-6 py-4">{product.id}</td>
+                <td scope="row" class="px-6 py-4 font-medium text-gray-900">
+                  {product.name}
+                </td>
+                <td>
+                  <a
+                    href={`/admin/${url}/edit/${product.id}`}
+                    class="font-medium text-blue-600 hover:underline text-right"
+                  >
+                    Editar
+                  </a>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <a
+                    href={`/admin/${url}/delete/${product.id}`}
+                    class="font-medium text-red-700 hover:underline text-right"
+                  >
+                    Eliminar
+                  </a>
+                </td>
+              </tr>
+            ))
+          }
+          <tr id="no-results" class="hidden">
+            <td colspan="99" class="text-center py-4 text-gray-500"
+              >No hay resultados con los filtros</td
+            >
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <script is:inline>
+    document.addEventListener("astro:after-swap", () => {
+      const input = document.getElementById("search");
+      const rows = document.querySelectorAll("#results tr:not(#no-results)");
+      const noResults = document.getElementById("no-results");
+
+      input.oninput = () => {
+        const filter = input.value.toLowerCase();
+        let visibleCount = 0;
+
+        rows.forEach((row) => {
+          const match = row.textContent.toLowerCase().includes(filter);
+          row.classList.toggle("hidden", !match);
+          if (match) visibleCount++;
+        });
+
+        noResults.classList.toggle("hidden", visibleCount > 0);
+      };
+    });
+  </script>
+</AdminLayout>

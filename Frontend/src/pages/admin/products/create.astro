@@ -1,0 +1,185 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { getProduct, createProduct } from "../../../api/products";
+import { getCategories } from "../../../api/categories";
+import { getPlatforms } from "../../../api/platforms";
+import type { Product } from "../../../utils/types";
+import type { Category } from "../../../utils/types";
+import type { Platform } from "../../../utils/types";
+
+const token = Astro.cookies.get("token")?.value || "";
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  const id = data.get("id") as string;
+  const name = data.get("name") as string;
+  const description = data.get("description") as string;
+  const price = data.get("price") as string;
+  const stock = data.get("stock") as string;
+  const release_date = data.get("release_date") as string;
+  const platform = data.get("platform") as string;
+  const category = data.get("category") as string;
+  const image = data.get("image") as File | null;
+
+  const response = await createProduct(token, {
+    name,
+    description,
+    price: Number(price),
+    stock: Number(stock),
+    release_date,
+    platform: Number(platform),
+    category: Number(category),
+    image,
+  });
+
+  return Astro.redirect("/admin/products");
+}
+
+const categories = await getCategories(token);
+const platforms = await getPlatforms(token);
+---
+
+<AdminLayout>
+  <section class="py-16">
+    <form
+      method="POST"
+      class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md"
+    >
+      <!-- Nombre -->
+      <div class="mb-4">
+        <label for="name" class="block mb-2 text-sm font-medium text-gray-900"
+          >Nombre</label
+        >
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+        />
+      </div>
+
+      <!-- Descripción -->
+      <div class="mb-4">
+        <label
+          for="description"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Descripción</label
+        >
+        <textarea
+          id="description"
+          name="description"
+          rows="4"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+        ></textarea>
+      </div>
+
+      <!-- Precio -->
+      <div class="mb-4">
+        <label for="price" class="block mb-2 text-sm font-medium text-gray-900"
+          >Precio</label
+        >
+        <input
+          type="number"
+          id="price"
+          name="price"
+          step="0.01"
+          required
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+        />
+      </div>
+
+      <!-- Stock -->
+      <div class="mb-4">
+        <label for="stock" class="block mb-2 text-sm font-medium text-gray-900"
+          >Stock</label
+        >
+        <input
+          type="number"
+          id="stock"
+          name="stock"
+          min="0"
+          required
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+        />
+      </div>
+
+      <!-- Fecha de lanzamiento -->
+      <div class="mb-4">
+        <label
+          for="release_date"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Fecha de lanzamiento</label
+        >
+        <input
+          type="date"
+          id="release_date"
+          name="release_date"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+        />
+      </div>
+
+      <!-- Plataforma -->
+      <div class="mb-4">
+        <label
+          for="platform"
+          class="block mb-2 text-sm font-medium text-gray-900">Plataforma</label
+        >
+        <select
+          id="platform"
+          name="platform"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+        >
+          <option value="">Seleccione una plataforma</option>
+          {
+            platforms.results.map((platform: Platform) => (
+              <option value={platform.id}>{platform.name}</option>
+            ))
+          }
+        </select>
+      </div>
+
+      <!-- Categoría -->
+      <div class="mb-4">
+        <label
+          for="category"
+          class="block mb-2 text-sm font-medium text-gray-900">Categoría</label
+        >
+        <select
+          id="category"
+          name="category"
+          required
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+        >
+          <option value="">Seleccione una categoría</option>
+          {
+            categories.results.map((category: Category) => (
+              <option value={category.id}>{category.name}</option>
+            ))
+          }
+        </select>
+      </div>
+
+      <!-- Imagen -->
+      <div class="mb-4">
+        <label for="image" class="block mb-2 text-sm font-medium text-gray-900"
+          >Imagen</label
+        >
+        <input
+          type="file"
+          id="image"
+          name="image"
+          accept="image/*"
+          class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+        />
+      </div>
+
+      <!-- Botón de envío -->
+      <button
+        type="submit"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+        >Guardar</button
+      >
+    </form>
+  </section>
+</AdminLayout>

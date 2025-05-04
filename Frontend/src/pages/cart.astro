@@ -1,0 +1,231 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCart, updateCart } from "../api/cart";
+import { addToCart, deleteFromCart, buyCart } from "../api/cart";
+
+const token = Astro.cookies.get("token")?.value || "";
+let msg = "";
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const itemId = formData.get("id");
+  const method = formData.get("_method");
+
+  if (method === "POST") {
+    const response = await buyCart(token);
+    return Astro.redirect("/checkout");
+  }
+
+  if (method === "PATCH") {
+    const quantity = formData.get("quantity");
+    if (itemId && quantity) {
+      const response = await updateCart(
+        token,
+        Number(itemId),
+        Number(quantity)
+      );
+      return Astro.redirect("/cart");
+    }
+  }
+
+  if (method === "DELETE") {
+    const itemId = formData.get("id");
+    if (itemId) {
+      const response = await deleteFromCart(token, Number(itemId));
+      return Astro.redirect("/cart");
+    }
+  }
+}
+
+const response = await getCart(token);
+const finalPrice = new Intl.NumberFormat("es-CL").format(
+  response.results.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
+    0
+  )
+);
+const items = response.results;
+---
+
+<Layout>
+  <section class="bg-white py-8 antialiased md:py-16">
+    <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+      <h2 class="text-xl font-semibold text-gray-900 sm:text-2xl">
+        Carrito de compras
+      </h2>
+
+      <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+        <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
+          <div class="space-y-6">
+            {
+              items.length === 0 ? (
+                <div class="flex flex-col items-center justify-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+                  <p class="text-lg font-semibold text-gray-900">
+                    No hay productos en el carrito
+                  </p>
+                  <a
+                    href="/search"
+                    class="inline-flex items-center gap-2 rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300"
+                  >
+                    Ir a comprar
+                  </a>
+                </div>
+              ) : (
+                ""
+              )
+            }
+            {
+              items.map((item) => (
+                <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
+                  <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
+                    <a
+                      href={"product/" + item.product.id}
+                      class="shrink-0 md:order-1"
+                    >
+                      <img
+                        transition:name={`product-${item.product.id}`}
+                        class="h-20 w-20"
+                        src={item.product.image}
+                        alt="imagen del producto"
+                      />
+                    </a>
+
+                    <label for="counter-input" class="sr-only">
+                      Elige la cantidad:
+                    </label>
+                    <div class="flex items-center justify-between md:order-3 md:justify-end">
+                      <div class="flex items-center gap-2">
+                        <p class="text-sm text-gray-800">Cantidad:</p>
+                        <form method="post">
+                          <input type="text" name="id" value={item.id} hidden />
+                          <input
+                            type="text"
+                            name="_method"
+                            value="PATCH"
+                            hidden
+                          />
+                          <input
+                            type="text"
+                            class="w-14  shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 rounded-md focus:outline-none focus:ring-1 hover:ring-1 hover:ring-gray-300 focus:ring-gray-300"
+                            name="quantity"
+                            value={item.quantity}
+                            required
+                          />
+                          <button class="hidden">cambiar</button>
+                        </form>
+                      </div>
+                      <div class="text-end md:order-4 md:w-32">
+                        <p class="text-base font-bold text-gray-900">
+                          $
+                          {new Intl.NumberFormat("es-CL").format(
+                            item.product.price * item.quantity
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
+                      <a
+                        href={"product/" + item.product.id}
+                        class="text-base font-medium text-gray-900 hover:underline"
+                      >
+                        {item.product.name}
+                      </a>
+
+                      <div class="flex items-center gap-4 pt-3">
+                        <form method="post">
+                          <input
+                            type="text"
+                            name="_method"
+                            value="DELETE"
+                            hidden
+                          />
+                          <input type="text" name="id" value={item.id} hidden />
+                          <button
+                            type="submit"
+                            class="inline-flex items-center text-sm font-medium text-red-600 hover:underline pointer-events-auto"
+                          >
+                            <svg
+                              class="me-1.5 h-5 w-5"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18 17.94 6M18 18 6.06 6"
+                              />
+                            </svg>
+                            Eliminar
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
+          <div
+            class="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
+          >
+            <p class="text-xl font-semibold text-gray-900">
+              Resumen de la orden
+            </p>
+
+            <div class="space-y-4">
+              <dl
+                class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2"
+              >
+                <dt class="text-base font-bold text-gray-900">Total</dt>
+                <dd class="text-base font-bold text-gray-900">${finalPrice}</dd>
+              </dl>
+            </div>
+
+            <form method="post">
+              <input type="text" name="_method" value="POST" hidden />
+              <button
+                class="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300"
+                >Proceder al Checkout</button
+              >
+            </form>
+
+            <div class="flex items-center justify-center gap-2">
+              <span class="text-sm font-normal text-gray-500"> o </span>
+              <a
+                href="/search"
+                title=""
+                class="inline-flex items-center gap-2 text-sm font-medium text-primary-700 underline hover:no-underline"
+              >
+                Continuar comprando
+                <svg
+                  class="h-5 w-5"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 12H5m14 0-4 4m4-4-4-4"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

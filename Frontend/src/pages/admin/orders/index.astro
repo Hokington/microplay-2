@@ -1,0 +1,86 @@
+---
+import AdminLayout from "../../../layouts/Layout.astro";
+import AdminNav from "../../../components/AdminNav.astro";
+
+import type { Platform } from "../../../utils/types";
+import { getOrders } from "../../../api/orders";
+
+const response = await getOrders(Astro.cookies.get("token")?.value || "");
+
+const columns = ["Id", "Usuario", "Fecha", "Estado", "Total"];
+const title = "Lista de ordenes";
+const url = "orders";
+---
+
+<AdminLayout>
+  <AdminNav />
+  <section class="max-w-screen-2xl mx-auto px-2 py-16">
+    <div class="sm:flex justify-between items-baseline mb-4">
+      <h1 class="text-4xl font-bold text-black mb-5">{title}</h1>
+      <div>
+        <input
+          id="search"
+          type="text"
+          name="search"
+          placeholder="Buscar"
+          class="px-6 py-3 border-gray-300 rounded-lg"
+        />
+      </div>
+    </div>
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+          <tr>
+            {
+              columns.map((col) => (
+                <th scope="col" class="px-6 py-3">
+                  {col}
+                </th>
+              ))
+            }
+          </tr>
+        </thead>
+        <tbody id="results">
+          {
+            response.results.map((order) => (
+              <tr class="bg-white border-b border-gray-200 transition-all duration-200 ease-in-out">
+                <td class="px-6 py-4">{order.id}</td>
+                <td scope="row" class="px-6 py-4 font-medium text-gray-900">
+                  {order.account}
+                </td>
+                <td class="px-6 py-4">{order.order_date}</td>
+                <td class="px-6 py-4">{order.total}</td>
+                <td class="px-6 py-4">{order.status}</td>
+              </tr>
+            ))
+          }
+          <tr id="no-results" class="hidden">
+            <td colspan="99" class="text-center py-4 text-gray-500"
+              >No hay resultados con los filtros</td
+            >
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <script is:inline>
+    document.addEventListener("astro:after-swap", () => {
+      const input = document.getElementById("search");
+      const rows = document.querySelectorAll("#results tr:not(#no-results)");
+      const noResults = document.getElementById("no-results");
+
+      input.oninput = () => {
+        const filter = input.value.toLowerCase();
+        let visibleCount = 0;
+
+        rows.forEach((row) => {
+          const match = row.textContent.toLowerCase().includes(filter);
+          row.classList.toggle("hidden", !match);
+          if (match) visibleCount++;
+        });
+
+        noResults.classList.toggle("hidden", visibleCount > 0);
+      };
+    });
+  </script>
+</AdminLayout>

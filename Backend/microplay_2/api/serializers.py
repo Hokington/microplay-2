@@ -3,10 +3,11 @@ from .models import Product, Order, OrderDetail, Account, Review, Payment, CartI
 
 class CategorySerializer(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField()
+    parent_name = serializers.ReadOnlyField(source='parent.name')
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'parent', 'subcategories']
+        fields = ['id', 'name', 'parent', 'parent_name', 'subcategories']
 
     def get_subcategories(self, obj):
         return CategorySerializer(obj.subcategories.all(), many=True).data
@@ -29,11 +30,26 @@ class ProductSerializer(serializers.ModelSerializer):
             'category', 'category_id', 'platform', 'platform_id', 'image'
         ]
 
+    def update(self, instance, validated_data):
+        image = validated_data.get("image", None)
+        if image is None and "image" not in self.context["request"].FILES:
+            validated_data.pop("image", None)
+        return super().update(instance, validated_data)
+
 class AccountSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = Account
-        fields = ['id', 'email', 'username', 'first_name', 'last_name', 'phone', 'address', 'role']
+        fields = ['id', 'email', 'username', 'first_name', 'last_name', 'phone', 'address', 'role', 'password']
 
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = Account(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+    
 class OrderDetailSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
     product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source='product', write_only=True)
@@ -44,11 +60,12 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     account = AccountSerializer(read_only=True)
-    order_details = OrderDetailSerializer(source='orderdetail_set', many=True, read_only=True)
+    # order_details = OrderDetailSerializer(source='orderdetail_set', many=True, read_only=True)
+    items = OrderDetailSerializer(many=True, write_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'account', 'order_date', 'status', 'total']
+        fields = ['id', 'account', 'order_date', 'status', 'total', 'items']
 
 class PaymentSerializer(serializers.ModelSerializer):
     order = OrderSerializer(read_only=True)
@@ -74,4 +91,5 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = ['id', 'account', 'product', 'quantity']
+        fields = ['id', 'product', 'quantity', 'product_id', 'account']
+        read_only_fields = ['id', 'account']
