@@ -12,6 +12,9 @@ export default defineConfig({
   },
   output: 'server',
   adapter: node({
-    mode: 'standalone',
+    mode: 'standalone',  
   }),
+  server: {
+      host: '0.0.0.0'
+    }
 });
