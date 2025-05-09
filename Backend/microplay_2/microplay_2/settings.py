@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-a8kse0a7w98f_w=3-qftyt1bqd^r3x5bhc#29@6g&kzu6o%#wa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'microplay-2-production.up.railway.app']
 
 
 # Application definition
