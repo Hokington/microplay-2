@@ -150,12 +150,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4321',
     'https://microplay-2-production.up.railway.app',
-    'ingenious-amazement-production.up.railway.app'
+    'https://ingenious-amazement-production.up.railway.app'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://microplay-2-production.up.railway.app',
-    'ingenious-amazement-production.up.railway.app'
+    'https://ingenious-amazement-production.up.railway.app'
 ]
 
 # AUTH_USER_MODEL = 'api.Account'
