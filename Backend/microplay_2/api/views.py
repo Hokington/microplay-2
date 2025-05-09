@@ -14,8 +14,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import authentication_classes, permission_classes
 from .permissions import IsAdminRole, IsAdminUserOrReadOnly
-import stripe
 from django.conf import settings
+import stripe
 
 @api_view(['POST'])
 def login(request):
@@ -185,6 +185,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        product_id = self.request.query_params.get('product_id')
+        if product_id:
+            return Review.objects.filter(product_id=product_id)
+        return Review.objects.all()
+
 
     def perform_create(self, serializer):
         serializer.save(account=self.request.user)
