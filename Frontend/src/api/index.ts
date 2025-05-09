@@ -65,3 +65,26 @@ export async function getOrders(token: string) {
     if (!res.ok) throw new Error(res.statusText);
     return res.json();
 }
+
+export async function createReview(token: string, productId: number, rating: number, comment: string) {
+    const res = await fetch(`${BASE_URL}/reviews/`, {
+        method: "POST",
+        headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            rating,
+            comment,
+        }),
+    });
+    if (!res.ok) throw new Error(res.statusText);
+    return res.json();
+}
+
+export async function getReviews(productId: number) {
+    const res = await fetch(`${BASE_URL}/reviews/?product_id=${productId}`);
+    if (!res.ok) throw new Error(res.statusText);
+    return res.json();
+}

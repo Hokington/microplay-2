@@ -11,9 +11,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import authentication_classes, permission_classes
 from .permissions import IsAdminRole, IsAdminUserOrReadOnly
+import stripe
+from django.conf import settings
 
 @api_view(['POST'])
 def login(request):
@@ -108,10 +110,28 @@ class OrderViewSet(viewsets.ModelViewSet):
         if not cart_items.exists():
             return Response({'error': 'El carrito está vacío.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # STRIPE
+        line_items = []
+        for item in cart_items:
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': item.product.name,
+                        'images': [request.build_absolute_uri(item.product.image.url)] if item.product.image else None,
+                        'description': item.product.description,
+                    },
+                    'unit_amount': int(item.product.price / 1000) * 100,
+                },
+                'quantity': item.quantity,
+            })
+
+
         total = sum(item.product.price * item.quantity for item in cart_items)
+
         order = Order.objects.create(
             account=self.request.user,
-            status='pendiente',
+            status='pagado',
             total=total,
         )
 
@@ -122,19 +142,32 @@ class OrderViewSet(viewsets.ModelViewSet):
                 quantity=item.quantity,
                 price=item.product.price
             )
+            Product.objects.filter(id=item.product.id).update(stock=item.product.stock - item.quantity)
 
         Payment.objects.create(
             order=order,
-            method='ninguno',
+            method='stripe',
             amount=total,
-            status='pendiente'
+            status='completado'
         )
 
         cart_items.delete()
 
         serializer = OrderSerializer(order)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+       
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=line_items,
+            mode='payment',
+            success_url=f"{settings.FRONT_END_SUCCESS_URL}",
+            cancel_url=f"{settings.FRONT_END_CANCEL_URL}",
+        )
 
+        order.stripe_session_id = checkout_session.id
+        order.save()
+
+        return Response({'session_id': checkout_session.id}, status=status.HTTP_200_OK)
 
 class OrderDetailViewSet(viewsets.ModelViewSet):
     queryset = OrderDetail.objects.all()
@@ -151,9 +184,16 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+        serializer.save(account=self.request.user)
 
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or request.user.role != 'administrativo':
+            return Response({'detail': 'No tienes permiso para eliminar.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
+    
 class CartItemViewSet(viewsets.ModelViewSet):
     queryset = CartItem.objects.none()
     serializer_class = CartItemSerializer

@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import { getCart, updateCart } from "../api/cart";
 import { addToCart, deleteFromCart, buyCart } from "../api/cart";
 
+const url = `${import.meta.env.API_URL}/orders/from-cart/`;
+const key = import.meta.env.STRIPE_PUBLIC_KEY as string;
 const token = Astro.cookies.get("token")?.value || "";
 let msg = "";
 
@@ -191,14 +193,35 @@ const items = response.results;
               </dl>
             </div>
 
-            <form method="post">
-              <input type="text" name="_method" value="POST" hidden />
-              <button
-                class="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300"
-                >Proceder al Checkout</button
-              >
-            </form>
+            <button
+              id="checkout-button"
+              class="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300"
+              >Proceder al Checkout</button
+            >
+            <script is:inline src="https://js.stripe.com/v3/"></script>
+            <script is:inline type="module" define:vars={{ token, url, key }}>
+              document.addEventListener("astro:after-swap", () => {
+                const stripe = Stripe(key);
 
+                document
+                  .getElementById("checkout-button")
+                  .addEventListener("click", async () => {
+                    const res = await fetch(url, {
+                      method: "POST",
+                      headers: {
+                        Authorization: `Token ${token}`,
+                        "Content-Type": "application/json",
+                      },
+                    });
+
+                    const data = await res.json();
+                    console.log(data);
+                    await stripe.redirectToCheckout({
+                      sessionId: data.session_id,
+                    });
+                  });
+              });
+            </script>
             <div class="flex items-center justify-center gap-2">
               <span class="text-sm font-normal text-gray-500"> o </span>
               <a

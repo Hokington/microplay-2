@@ -1,0 +1,74 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getOrders } from "../api";
+
+const response = await getOrders(Astro.cookies.get("token")?.value || "");
+console.log(response);
+const orders = response.reverse();
+---
+
+<Layout>
+  <section
+    class="py-8 bg-white md:py-16 mx-auto max-w-screen-xl px-4 2xl:px-0 antialiased"
+  >
+    <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 md:p-8">
+        <h3 class="mb-4 text-xl font-semibold text-gray-900">
+          Últimas ordenes
+        </h3>
+        {
+          orders.map((order) => (
+            <div class="flex flex-wrap items-center gap-y-4 border-b border-gray-200 py-4 md:pb-5">
+              <dl class="w-1/2 sm:w-48">
+                <dt class="text-base font-medium text-gray-500">Orden ID:</dt>
+                <dd class="mt-1.5 text-base font-semibold text-gray-900">
+                  # {order.id}
+                </dd>
+              </dl>
+
+              <dl class="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">
+                <dt class="text-base font-medium text-gray-500">Fecha:</dt>
+                <dd class="mt-1.5 text-base font-semibold text-gray-900">
+                  {order.order_date}
+                </dd>
+              </dl>
+
+              <dl class="w-1/2 sm:w-1/5 md:flex-1 lg:w-auto">
+                <dt class="text-base font-medium text-gray-500">
+                  Precio final:
+                </dt>
+                <dd class="mt-1.5 text-base font-semibold text-gray-900">
+                  $ {new Intl.NumberFormat("es-CL").format(order.total)}
+                </dd>
+              </dl>
+
+              <dl class="w-1/2 sm:w-1/4 sm:flex-1 lg:w-auto">
+                <dt class="text-base font-medium text-gray-500">Estado:</dt>
+                <dd class="me-2 mt-1.5 inline-flex shrink-0 items-center rounded bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                  <svg
+                    class="me-1 h-3 w-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                    />
+                  </svg>
+                  {order.status}
+                </dd>
+              </dl>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,144 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getOrders } from "../api";
+
+const token = Astro.cookies.get("token")?.value || "";
+const response = await getOrders(token);
+const order = response.at(-1);
+console.log(order);
+---
+
+<Layout>
+  <section
+    class="py-8 bg-white md:py-16 mx-auto max-w-screen-xl px-4 2xl:px-0 antialiased"
+  >
+    <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="mb-4 text-4xl font-semibold text-gray-900">
+          Tu compra fue exitosa
+        </h1>
+        <a
+          href="/orders"
+          class="rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300"
+          >Todas mis compras</a
+        >
+      </div>
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 md:p-8">
+        <div
+          class="flex flex-wrap items-center justify-between gap-y-4 py-4 md:pb-5"
+        >
+          <dl class="w-1/2 sm:w-48">
+            <dt class="text-base font-medium text-gray-500">Orden ID:</dt>
+            <dd class="mt-1.5 text-base font-semibold text-gray-900">
+              # {order.id}
+            </dd>
+          </dl>
+
+          <dl class="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">
+            <dt class="text-base font-medium text-gray-500">Fecha:</dt>
+            <dd class="mt-1.5 text-base font-semibold text-gray-900">
+              {order.order_date}
+            </dd>
+          </dl>
+
+          <dl class="w-1/2 sm:w-1/5 md:flex-1 lg:w-auto">
+            <dt class="text-base font-medium text-gray-500">Precio final:</dt>
+            <dd class="mt-1.5 text-base font-semibold text-gray-900">
+              $ {new Intl.NumberFormat("es-CL").format(order.total)}
+            </dd>
+          </dl>
+
+          <dl class="w-1/2 sm:w-1/4 sm:flex-1 lg:w-auto">
+            <dt class="text-base font-medium text-gray-500">Estado:</dt>
+            <dd
+              class="me-2 mt-1.5 inline-flex shrink-0 items-center rounded bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"
+            >
+              <svg
+                class="me-1 h-3 w-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                ></path>
+              </svg>
+              {order.status}
+            </dd>
+          </dl>
+        </div>
+        <div class="bg-white border border-gray-200 p-4 md:p-8">
+          <h3 class="mb-4 text-xl font-semibold mt-5 text-gray-900">
+            Detalles de la compra
+          </h3>
+          {
+            order.details.map((item) => (
+              <div class="flex flex-wrap items-center gap-y-4 border-b border-gray-200 py-4 md:pb-5">
+                <dl class="pr-8">
+                  <img
+                    class="size-10"
+                    src={item.product.image}
+                    alt={item.product.name}
+                  />
+                </dl>
+                <dl class="w-1/2 sm:w-48">
+                  <dt class="text-base font-medium text-gray-500">Producto</dt>
+                  <dd class="mt-1.5 text-sm font-semibold text-gray-900">
+                    {item.product.name}
+                  </dd>
+                </dl>
+
+                <dl class="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">
+                  <dt class="text-base font-medium text-gray-500">Cantidad:</dt>
+                  <dd class="mt-1.5 text-base font-semibold text-gray-900">
+                    {item.quantity}
+                  </dd>
+                </dl>
+
+                <dl class="w-1/2 sm:w-1/5 md:flex-1 lg:w-auto">
+                  <dt class="text-base font-medium text-gray-500">Precio:</dt>
+                  <dd class="mt-1.5 text-base font-semibold text-gray-900">
+                    $ {new Intl.NumberFormat("es-CL").format(item.price)}
+                  </dd>
+                </dl>
+
+                <dl class="w-1/2 sm:w-1/4 sm:flex-1 lg:w-auto">
+                  <dt class="text-base font-medium text-gray-500">Estado:</dt>
+                  <dd class="me-2 mt-1.5 inline-flex shrink-0 items-center rounded bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                    <svg
+                      class="me-1 h-3 w-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                      />
+                    </svg>
+                    {new Date(item.product.release_date) > new Date()
+                      ? "Preventa"
+                      : "Procesando envío"}
+                  </dd>
+                </dl>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

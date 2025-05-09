@@ -56,16 +56,16 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderDetail
-        fields = ['id', 'order', 'product', 'quantity', 'price']
+        fields = ['id', 'order', 'product', 'product_id', 'quantity', 'price']
 
 class OrderSerializer(serializers.ModelSerializer):
     account = AccountSerializer(read_only=True)
-    # order_details = OrderDetailSerializer(source='orderdetail_set', many=True, read_only=True)
+    details = OrderDetailSerializer(source='orderdetail_set', many=True, read_only=True)
     items = OrderDetailSerializer(many=True, write_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'account', 'order_date', 'status', 'total', 'items']
+        fields = ['id', 'account', 'order_date', 'status', 'total', 'items', 'details']
 
 class PaymentSerializer(serializers.ModelSerializer):
     order = OrderSerializer(read_only=True)
@@ -78,11 +78,13 @@ class PaymentSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     account = AccountSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
-    product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source='product', write_only=True)
+    product_id = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(), source='product', write_only=True
+    )
 
     class Meta:
         model = Review
-        fields = ['id', 'account', 'product', 'rating', 'comment', 'date']
+        fields = ['id', 'account', 'product', 'product_id', 'rating', 'comment', 'date']
 
 class CartItemSerializer(serializers.ModelSerializer):
     account = AccountSerializer(read_only=True)

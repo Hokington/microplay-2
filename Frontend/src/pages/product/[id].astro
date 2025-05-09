@@ -1,10 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getProducts } from "../../api";
+import { getProducts, createReview, getReviews } from "../../api";
 import type { CartItem } from "../../utils/types";
 import { addToCart } from "../../api/cart";
 
 const { id } = Astro.params;
+const token = Astro.cookies.get("token")?.value || "";
 
 if (!id) {
   return Astro.redirect("/404");
@@ -14,8 +15,22 @@ const productId = parseInt(id, 10);
 const response = await getProducts({ id: productId });
 const product = await response.results[0];
 
+const reviews = await getReviews(productId);
+
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
+
+  if (formData.get("_method") === "create") {
+    const rating = Number(formData.get("rating"));
+    const comment = String(formData.get("comment"));
+    const productId = Number(formData.get("id"));
+
+    if (rating && comment && productId) {
+      await createReview(token, productId, rating, comment);
+      return Astro.redirect(`/product/${productId}`);
+    }
+  }
+
   const productId = Number(formData.get("id"));
 
   if (productId) {
@@ -220,5 +235,79 @@ if (Astro.request.method === "POST") {
         </div>
       </div>
     </div>
+    <section class="py-8 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Reseñas</h2>
+        <form
+          method="POST"
+          class="mx-auto p-4 mt-8 bg-white border-b border-gray-200 pb-4 mb-4"
+        >
+          <div class="mb-4">
+            <input type="text" name="id" value={product.id} hidden />
+            <input type="text" name="_method" value="create" hidden />
+            <label
+              for="rating"
+              class="block mb-2 text-sm font-medium text-gray-900"
+              >Calificación</label
+            >
+            <select
+              id="rating"
+              name="rating"
+              required
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+            >
+              <option value="" disabled selected>Elige una calificación</option>
+              <option value="1">⭐ 1</option>
+              <option value="2">⭐ 2</option>
+              <option value="3">⭐ 3</option>
+              <option value="4">⭐ 4</option>
+              <option value="5">⭐ 5</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="comment"
+              class="block mb-2 text-sm font-medium text-gray-900"
+              >Comentario</label
+            >
+            <textarea
+              id="comment"
+              name="comment"
+              rows="3"
+              required
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+              placeholder="Escribe tu opinión aquí..."></textarea>
+          </div>
+
+          <button
+            type="submit"
+            class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            Enviar Reseña
+          </button>
+        </form>
+        <div class="grid gap-4">
+          {
+            reviews.results.map((review) => (
+              <div class="p-4 border border-gray-200 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                  <h5 class="text-sm font-bold text-gray-900">
+                    {review.account.username}
+                  </h5>
+                  <span class="text-yellow-500 font-semibold">
+                    {"⭐".repeat(review.rating)}
+                  </span>
+                </div>
+                <p class="text-sm text-gray-700">{review.comment}</p>
+                <p class="text-xs text-gray-400 mt-2">
+                  {new Date(review.date).toLocaleDateString()}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
   </section>
 </Layout>

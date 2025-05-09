@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+from environ import Env
+env = Env()
+env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -148,3 +152,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # AUTH_USER_MODEL = 'api.Account'
+
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY_TEST', default="secret")
+FRONT_END_SUCCESS_URL = env('FRONT_END_SUCCESS_URL', default="http://localhost:4321/success")
+FRONT_END_CANCEL_URL = env('FRONT_END_CANCEL_URL', default="http://localhost:4321/cancel")
