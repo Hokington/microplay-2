@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 from environ import Env
 env = Env()
 env.read_env()
@@ -156,3 +156,7 @@ CORS_ALLOWED_ORIGINS = [
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY_TEST', default="secret")
 FRONT_END_SUCCESS_URL = env('FRONT_END_SUCCESS_URL', default="http://localhost:4321/success")
 FRONT_END_CANCEL_URL = env('FRONT_END_CANCEL_URL', default="http://localhost:4321/cancel")
+
+STATICFILES_DIR = [
+    os.path.join(BASE_DIR, 'microplay_2/static')
+]
